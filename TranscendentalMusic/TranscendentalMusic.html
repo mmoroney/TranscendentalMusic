@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Transcendental Music</h1>
+
+Start at digit number: <input id="startAtDigitNumber" type="number">
+<button id="goButton" onclick="onGo()">Go!</button>
+<br />
+<br />
+<button id="nextButton" onclick="onNext()">Next</button>
+<button id="previousButton" onclick="onPrevious()">Previous</button>
+<button id="randomButton" onclick="onRandom()">Random</button>
+<br />
+<br />
+<div id="Images" />
+
+<script src="DigitsOfPi.js"></script>
+
+<script>
+    var lines = 20;
+    var digitsPerLine = 8;
+    var imageWidth = 192;
+    var imageHeight = 60;
+    var randomDigitLimit = 100000;
+
+    var startingDigit = 0;
+
+    refresh();
+
+    function onGo() {
+        startingDigit = Number(document.getElementById("startAtDigitNumber").value);
+        refresh();
+    }
+
+    function onNext() {
+        startingDigit++;
+        refresh();
+    }
+
+    function onPrevious() {
+        startingDigit--;
+        refresh();
+    }
+
+    function onRandom() {
+        startingDigit = Math.floor((Math.random() * randomDigitLimit) + 1);
+        refresh();
+    }
+
+    function refresh() {
+        document.getElementById("previousButton").disabled = (startingDigit == 0);
+        document.getElementById("startAtDigitNumber").value = startingDigit;
+        var digits = GetDigits(startingDigit, lines * digitsPerLine);
+
+        var imageDiv = document.getElementById("Images");
+        while (imageDiv.hasChildNodes())
+            imageDiv.removeChild(imageDiv.firstChild);
+
+        for (var i = 0; i < lines; i++)
+        {
+            var digitParagraph = document.createElement("p");
+            var digitText = "";
+            for (var j = 0; j < digitsPerLine; j++)
+            {
+                digitText += digits[i * digitsPerLine + j].toString() + " ";
+            }
+
+            digitParagraph.innerHTML = digitText;
+            imageDiv.appendChild(digitParagraph);
+            imageDiv.appendChild(document.createElement("br"));
+
+            for(var j = 0; j < digitsPerLine; j++)
+            {
+                var img = document.createElement("img");
+                img.src = digits[i * digitsPerLine + j].toString() + ".jpg";
+                img.width = imageWidth;
+                img.height = imageHeight;
+                imageDiv.appendChild(img);
+            }
+
+            imageDiv.appendChild(document.createElement("br"));
+        }
+    }
+</script>
+
+</body>
+</html> 
