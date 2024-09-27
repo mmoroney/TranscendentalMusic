@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+    <h1>Transcendental Music</h1>
+
+    Start at digit number: <input id="startAtDigitNumber" type="number">
+    <button id="goButton" onclick="onGo()">Go!</button>
+    <br />
+    <br />
+    <button id="nextButton" onclick="onNext()">Next</button>
+    <button id="previousButton" onclick="onPrevious()">Previous</button>
+    <button id="randomButton" onclick="onRandom()">Random</button>
+    <br />
+    <br />
+    <div id="output" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+    <script src="DigitsOfPi.js"></script>
+
+    <script>
+        const { Renderer, Beam, Stave, StaveNote, Formatter } = Vex.Flow;
+
+        const lines = 20;
+        const digitsPerLine = 8;
+        const digitWidth = 200;
+        const randomDigitLimit = 100000;
+
+        var startingDigit = 0;
+
+        refresh();
+
+        function onGo() {
+            startingDigit = Number(document.getElementById("startAtDigitNumber").value);
+            refresh();
+        }
+
+        function onNext() {
+            startingDigit++;
+            refresh();
+        }
+
+        function onPrevious() {
+            startingDigit--;
+            refresh();
+        }
+
+        function onRandom() {
+            startingDigit = Math.floor((Math.random() * randomDigitLimit) + 1);
+            refresh();
+        }
+
+        function refresh() {
+            document.getElementById("previousButton").disabled = (startingDigit == 0);
+            document.getElementById("startAtDigitNumber").value = startingDigit;
+
+            const div = document.getElementById("output");
+            div.innerHTML = ""
+            const renderer = new Renderer(div, Renderer.Backends.SVG);
+            const digits = GetDigits(startingDigit, lines * digitsPerLine);
+
+            renderer.resize(1800, 2000);
+            const context = renderer.getContext();
+
+            for (row = 0; row < lines; row++) {
+                for (col = 0; col < digitsPerLine; col++) {
+                    const stave = new Stave(10 + digitWidth * col, 40 + row * 80, digitWidth);
+
+                    if (col == 0) {
+                        stave.addClef("treble");
+
+                        if (row == 0) {
+                            stave.addTimeSignature("2/4");
+                        }
+                    }
+
+                    stave.setContext(context).draw();
+
+                    const { notes, beams } = digitToNotes(digits[row * digitsPerLine + col]);
+
+                    Formatter.FormatAndDraw(context, stave, notes);
+
+                    beams.forEach(beam => {
+                        beam.setContext(context).draw();
+                    });
+                }
+            }
+        }
+
+        function digitToNotes(digit) {
+            notes = [];
+            beams = [];
+            switch (digit) {
+                case 0:
+                    notes = [makeHalfRest()];
+                    break;
+                case 1:
+                    notes = [makeQuarterRest(), makeEighthRest(), makeEighthNote()];
+                    break;
+                case 2:
+                    notes = [makeQuarterRest(), makeQuarterNote()];
+                    break;
+                case 3:
+                    notes = [makeQuarterRest(), makeEighthNote(), makeEighthNote()];
+                    beams = [new Beam([notes[1], notes[2]])];
+                    break;
+                case 4:
+                    notes = [makeEighthRest(), makeEighthNote(), makeQuarterRest()];
+                    break;
+                case 5:
+                    notes = [makeEighthRest(), makeEighthNote(), makeEighthRest(), makeEighthNote()];
+                    break;
+                case 6:
+                    notes = [makeEighthRest(), makeEighthNote(), makeQuarterNote()];
+                    break;
+                case 7:
+                    notes = [makeEighthRest(), makeEighthNote(), makeEighthNote(), makeEighthNote()];
+                    beams = [new Beam([notes[2], notes[3]])];
+                    break;
+                case 8:
+                    notes = [makeQuarterNote(), makeQuarterRest()];
+                    break;
+                case 9:
+                    notes = [makeQuarterNote(), makeEighthRest(), makeEighthNote()];
+                    break;
+                case 10:
+                    notes = [makeQuarterNote(), makeQuarterNote()];
+                    break;
+                case 11:
+                    notes = [makeQuarterNote(), makeEighthNote(), makeEighthNote()];
+                    beams = [new Beam([notes[1], notes[2]])];
+                    break;
+                case 12:
+                    notes = [makeEighthNote(), makeEighthNote(), makeQuarterRest()];
+                    beams = [new Beam([notes[0], notes[1]])];
+                    break;
+                case 13:
+                    notes = [makeEighthNote(), makeEighthNote(), makeEighthRest(), makeEighthNote()];
+                    beams = [new Beam([notes[0], notes[1]])];
+                    break;
+                case 14:
+                    notes = [makeEighthNote(), makeEighthNote(), makeQuarterNote()];
+                    beams = [new Beam([notes[0], notes[1]])];
+                    break;
+                case 15:
+                    notes = [makeEighthNote(), makeEighthNote(), makeEighthNote(), makeEighthNote()];
+                    beams = [new Beam([notes[0], notes[1]]), new Beam([notes[2], notes[3]])];
+                    break;
+                default:
+                    return null;
+            }
+
+            return {
+                notes: notes,
+                beams: beams,
+            }
+        }
+
+        function makeEighthNote() {
+            return new StaveNote({ keys: ["a/4"], duration: "8" })
+        }
+
+        function makeQuarterNote() {
+            return new StaveNote({ keys: ["a/4"], duration: "4" })
+        }
+
+        function makeEighthRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "8r" });
+        }
+
+        function makeQuarterRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "4r" });
+        }
+
+        function makeHalfRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "2r", align_center: true });
+        }
+    </script>
+
+</body>
+</html> 
