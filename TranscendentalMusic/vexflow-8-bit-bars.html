@@ -45,7 +45,7 @@
             beams = [];
 
             if (digit == 0) {
-                notes = [makeHalfRest()];
+                notes = [makeWholeRest()];
                 return {
                     notes: notes,
                     beams: beams,
@@ -104,8 +104,8 @@
             return new StaveNote({ keys: ["a/4"], duration: "4r" });
         }
 
-        function makeHalfRest() {
-            return new StaveNote({ keys: ["a/4"], duration: "2r", align_center: true });
+        function makeWholeRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "1r", align_center: true });
         }
     </script>
 </body>
