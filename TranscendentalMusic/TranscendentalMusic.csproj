@@ -91,6 +91,7 @@
     <Content Include="9.jpg" />
     <Content Include="DigitsOfPi.js" />
     <Content Include="TranscendentalMusic.html" />
+    <Content Include="vexflow-8-bit-bars.html" />
     <Content Include="vexflow-4-bit-bars.html" />
     <Content Include="vexflow-transcendental-music-4-bit.html" />
     <Content Include="Web.config" />

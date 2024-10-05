@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>VexFlow Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+</head>
+<body>
+    <div id="output"></div>
+    <script>
+        const { Renderer, Beam, Stave, StaveNote, Formatter } = Vex.Flow;
+
+        const div = document.getElementById("output");
+        const renderer = new Renderer(div, Renderer.Backends.SVG);
+
+        const barWidth = 200
+
+        renderer.resize(1800, 9600);
+        const context = renderer.getContext();
+
+        for (row = 0; row < 32; row++) {
+            for (col = 0; col < 8; col++) {
+                const stave = new Stave(10 + barWidth * col, 40 + row * 80, barWidth);
+
+                if (col == 0) {
+                    stave.addClef("treble");
+                    if (row == 0) {
+                        stave.addTimeSignature("4/4");
+                    }
+                }
+
+                stave.setContext(context).draw();
+
+                const { notes, beams } = digitToNotes(8 * row + col);
+
+                Formatter.FormatAndDraw(context, stave, notes)
+
+                beams.forEach(beam => {
+                    beam.setContext(context).draw();
+                });
+            }
+        }
+
+        function digitToNotes(digit) {
+            notes = [];
+            beams = [];
+
+            if (digit == 0) {
+                notes = [makeHalfRest()];
+                return {
+                    notes: notes,
+                    beams: beams,
+                }
+            }
+
+            for (i = 0; i < 4; i++) {
+                bits = (digit >> (2 * (3 - i))) & 3;
+                switch (bits) {
+                    case 0:
+                        notes.push(makeQuarterRest());
+                        break;
+                    case 1:
+                        notes.push(makeEighthRest());
+                        notes.push(makeEighthNote());
+                        break;
+                    case 2:
+                        notes.push(makeQuarterNote());
+                        break;
+                    case 3:
+                        note1 = makeEighthNote();
+                        note2 = makeEighthNote();
+                        notes.push(note1);
+                        notes.push(note2);
+                        beams.push(new Beam([note1, note2]))
+                        break;
+                }
+            }
+
+            return {
+                notes: notes,
+                beams: beams,
+            }
+        }
+
+        function bitsToNotes(bits, notes, beams) {
+            switch (bits) {
+                case 0:
+                    notes.con
+            }
+        }
+
+        function makeEighthNote() {
+            return new StaveNote({ keys: ["a/4"], duration: "8" })
+        }
+
+        function makeQuarterNote() {
+            return new StaveNote({ keys: ["a/4"], duration: "4" })
+        }
+
+        function makeEighthRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "8r" });
+        }
+
+        function makeQuarterRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "4r" });
+        }
+
+        function makeHalfRest() {
+            return new StaveNote({ keys: ["a/4"], duration: "2r", align_center: true });
+        }
+    </script>
+</body>
+</html>
